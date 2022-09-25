@@ -1,0 +1,21 @@
+﻿<Application
+    x:Class="Palette.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:Palette"
+    ShutdownMode="OnMainWindowClose"
+    StartupUri="Views/MainWindow.xaml">
+    <Application.Resources>
+
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Palette;component/Resource/CirThumbStyle.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Palette;component/Resource/ColorSliderStyle.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Palette;component/Resource/FontFamily.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+
+
+
+    </Application.Resources>
+</Application>
