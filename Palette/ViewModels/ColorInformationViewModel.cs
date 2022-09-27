@@ -237,11 +237,11 @@ namespace Palette.ViewModels
                 try
                 {
                     Clipboard.SetText(o.ToString());
-                    MsssageExtension.Show($"已复制: {o.ToString()}");
+                    MessageExtension.Show($"已复制: {o.ToString()}");
                 }
                 catch (Exception ex)
                 {
-                    MsssageExtension.Show(ex.Message);
+                    MessageExtension.Show(ex.Message);
                 }
             }
         });

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Palette.Extension;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -26,6 +27,7 @@ namespace Palette
             Trace.WriteLine(e.Exception.HelpLink);
             Trace.WriteLine(e.Exception.Data);
             Trace.WriteLine(e.Exception.Message);
+            MessageExtension.Show(e.Exception.Message, 5000);
             e.Handled = true;
         }
     }

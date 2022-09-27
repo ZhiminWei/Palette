@@ -31,7 +31,7 @@ namespace Palette.Views
             InitializeComponent();
         }
 
-        public void ShowMsg(string msg)
+        public void ShowMsg(string msg,int timeSpan = 2000)
         {
             this.msgText.Text = msg;
             this.Visibility = Visibility.Visible;
@@ -44,7 +44,7 @@ namespace Palette.Views
                     this.Visibility = Visibility.Collapsed;
                 });
 
-            }, null, 2000, 0);
+            }, null, timeSpan, 0);
         }
 
         private void MsgAlert_Closed(object? sender, EventArgs e)

@@ -80,16 +80,22 @@ namespace Palette.Models
             try
             {
                 Color color;
-                if (hexColor.Substring(0, 1) == "#") color = (Color)ColorConverter.ConvertFromString(hexColor);
-                else color = (Color)ColorConverter.ConvertFromString("#" + hexColor);
+                if (hexColor.Substring(0, 1) == "#")
+                {
+                    color = (Color)ColorConverter.ConvertFromString(hexColor);
+                }
+                else
+                {
+                    color = (Color)ColorConverter.ConvertFromString("#" + hexColor);
+                }
                 R = color.R;
                 G = color.G;
                 B = color.B;
                 A = color.A;
             }
-            catch
+            catch (Exception ex)
             {
-
+                MessageExtension.Show($"无法解析颜色:\"{hexColor}\",{ex.Message}");
             }
         }
         #endregion

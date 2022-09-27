@@ -23,7 +23,20 @@ namespace Palette.Extension
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (value == null)
+                {
+                    return null;
+                }
+                RGBColor rgb = new RGBColor(value?.ToString());
+                return rgb;
+            }
+            catch (Exception ex)
+            {
+                MessageExtension.Show(ex.Message);
+                return null;
+            }
         }
     }
 
@@ -61,13 +74,25 @@ namespace Palette.Extension
 
                 return hex.Substring(0, 1) + hex.Substring(3, 6);
             }
-
             return string.Empty;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (value == null)
+                {
+                    return null;
+                }
+                RGBColor rgb = new RGBColor(value?.ToString());
+                return rgb;
+            }
+            catch (Exception ex)
+            {
+                MessageExtension.Show(ex.Message);
+                return null;
+            }
         }
     }
 }

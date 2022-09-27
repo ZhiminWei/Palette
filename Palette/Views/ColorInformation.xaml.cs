@@ -105,22 +105,34 @@ namespace Palette.Views
 
         private static void OnCurrentBrushChangedCallBack(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var ci = d as ColorInformation;
-            var vm = ci.DataContext as ColorInformationViewModel;
-            if (vm != null)
+            if (e.NewValue  == null)
             {
-                vm.ComplementaryBrush = CalculateComplementaryColor(e.NewValue as SolidColorBrush);
-                var ab = CalculateColor(e.NewValue as SolidColorBrush, 30);
-                vm.AdjacentBrush1 = ab.Item1;
-                vm.AdjacentBrush2 = ab.Item2;
-                var cb = CalculateColor(e.NewValue as SolidColorBrush, 60);
-                vm.ContrastingBrush1 = cb.Item1;
-                vm.ContrastingBrush2 = cb.Item2;
-                var mb = CalculateColor(e.NewValue as SolidColorBrush, 90);
-                vm.MediumBrush1 = mb.Item1;
-                vm.MediumBrush2 = mb.Item2;
-                vm.MediumBrush3 = vm.ComplementaryBrush;
+
             }
+            else if (e.NewValue is Color color)
+            {
+
+            }
+            else
+            {
+                var ci = d as ColorInformation;
+                var vm = ci.DataContext as ColorInformationViewModel;
+                if (vm != null)
+                {
+                    vm.ComplementaryBrush = CalculateComplementaryColor(e.NewValue as SolidColorBrush);
+                    var ab = CalculateColor(e.NewValue as SolidColorBrush, 30);
+                    vm.AdjacentBrush1 = ab.Item1;
+                    vm.AdjacentBrush2 = ab.Item2;
+                    var cb = CalculateColor(e.NewValue as SolidColorBrush, 60);
+                    vm.ContrastingBrush1 = cb.Item1;
+                    vm.ContrastingBrush2 = cb.Item2;
+                    var mb = CalculateColor(e.NewValue as SolidColorBrush, 90);
+                    vm.MediumBrush1 = mb.Item1;
+                    vm.MediumBrush2 = mb.Item2;
+                    vm.MediumBrush3 = vm.ComplementaryBrush;
+                }
+            }
+            
         }
 
         private void RenderColorPicker(double brightness)

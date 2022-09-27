@@ -8,11 +8,11 @@ using System.Windows;
 
 namespace Palette.Extension
 {
-    internal class MsssageExtension
+    internal class MessageExtension
     {
         private static readonly MsgAlert msgAlert;
 
-        static MsssageExtension()
+        static MessageExtension()
         {
             MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
             msgAlert = new MsgAlert();
@@ -22,7 +22,7 @@ namespace Palette.Extension
             msgAlert.Show();
         }
 
-        private MsssageExtension()
+        private MessageExtension()
         {
 
         }
@@ -33,6 +33,13 @@ namespace Palette.Extension
             msgAlert.Left = mainWindow.Left + (mainWindow.ActualWidth / 2) - msgAlert.Width / 2;
             msgAlert.Top = mainWindow.Top + mainWindow.ActualHeight - 55;
             msgAlert.ShowMsg(msg);
+        }
+        public static void Show(string msg, int timeSpan)
+        {
+            MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
+            msgAlert.Left = mainWindow.Left + (mainWindow.ActualWidth / 2) - msgAlert.Width / 2;
+            msgAlert.Top = mainWindow.Top + mainWindow.ActualHeight - 55;
+            msgAlert.ShowMsg(msg, timeSpan);
         }
 
 
