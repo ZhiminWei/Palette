@@ -58,12 +58,12 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="20" />
-                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="280" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
-                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="280" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <Image
@@ -193,7 +193,8 @@
                         Grid.Column="1"
                         Height="28"
                         VerticalContentAlignment="Center"
-                        Text="{Binding ElementName=colorInfo, Path=CurrentBrush, Converter={StaticResource HEXStringRestructuringConverter}}" />
+                        LostFocus="hexText_LostFocus"
+                        Text="{Binding ElementName=colorInfo, Path=CurrentBrush, Converter={StaticResource HEXStringRestructuringConverter}, Mode=OneWay, UpdateSourceTrigger=LostFocus}" />
                     <Button
                         Grid.Row="1"
                         Grid.Column="2"
@@ -213,7 +214,8 @@
                         Grid.Column="1"
                         Height="28"
                         VerticalContentAlignment="Center"
-                        Text="{Binding ElementName=colorInfo, Path=CurrentBrush, Converter={StaticResource SoilderBrushToRGBStringConverter}}" />
+                        LostFocus="rgbText_LostFocus"
+                        Text="{Binding ElementName=colorInfo, Path=CurrentBrush, Converter={StaticResource SoilderBrushToRGBStringConverter}, Mode=OneWay}" />
                     <Button
                         Grid.Row="2"
                         Grid.Column="2"
@@ -233,7 +235,8 @@
                         Grid.Column="1"
                         Height="28"
                         VerticalContentAlignment="Center"
-                        Text="{Binding ElementName=colorInfo, Path=CurrentBrush, Converter={StaticResource SoilderBrushToHSBStringConverter}}" />
+                        LostFocus="hsbText_LostFocus"
+                        Text="{Binding ElementName=colorInfo, Path=CurrentBrush, Converter={StaticResource SoilderBrushToHSBStringConverter}, Mode=OneWay}" />
                     <Button
                         Grid.Row="3"
                         Grid.Column="2"

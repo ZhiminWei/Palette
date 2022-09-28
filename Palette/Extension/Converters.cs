@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 
@@ -23,20 +24,7 @@ namespace Palette.Extension
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            try
-            {
-                if (value == null)
-                {
-                    return null;
-                }
-                RGBColor rgb = new RGBColor(value?.ToString());
-                return rgb;
-            }
-            catch (Exception ex)
-            {
-                MessageExtension.Show(ex.Message);
-                return null;
-            }
+            return DependencyProperty.UnsetValue;
         }
     }
 
@@ -58,7 +46,7 @@ namespace Palette.Extension
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            return DependencyProperty.UnsetValue;
         }
     }
 
@@ -79,20 +67,7 @@ namespace Palette.Extension
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            try
-            {
-                if (value == null)
-                {
-                    return null;
-                }
-                RGBColor rgb = new RGBColor(value?.ToString());
-                return rgb;
-            }
-            catch (Exception ex)
-            {
-                MessageExtension.Show(ex.Message);
-                return null;
-            }
+            return DependencyProperty.UnsetValue;
         }
     }
 }

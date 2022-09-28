@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.VisualBasic;
 using Palette.Extension;
 using Palette.Models;
 using Palette.ViewModels;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,6 +19,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Xps.Serialization;
 
 namespace Palette.Views
 {
@@ -82,7 +85,7 @@ namespace Palette.Views
 
 
 
-
+        static bool _callbackOperation = false;
         private int radius = 130;
         private WriteableBitmap bitmap;
         /// <summary>
@@ -100,39 +103,42 @@ namespace Palette.Views
         // Using a DependencyProperty as the backing store for CurrentBrush.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty CurrentBrushProperty =
             DependencyProperty.Register("CurrentBrush", typeof(SolidColorBrush), typeof(ColorInformation),
-                new PropertyMetadata(Brushes.White, OnCurrentBrushChangedCallBack));
+                new PropertyMetadata(Brushes.White, OnCurrentBrushChangedCallBack, CurrentBrushCoerceValue));
 
+        private static object CurrentBrushCoerceValue(DependencyObject d, object baseValue)
+        {
+            if (baseValue != null && baseValue is SolidColorBrush)
+            {
+                return (SolidColorBrush)baseValue;
+            }
+            return DependencyProperty.UnsetValue;
+        }
 
         private static void OnCurrentBrushChangedCallBack(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (e.NewValue  == null)
+            if (_callbackOperation)
             {
-
+                var ColorInformation = d as ColorInformation;
+                var point = Utility.GetPointLocationBySolidColorBrush(e.NewValue as SolidColorBrush, new Point(140, 140), 130);
+                ColorInformation?.cirThumb.SetPosition(point);
+                _callbackOperation = false;
             }
-            else if (e.NewValue is Color color)
+            var ci = d as ColorInformation;
+            var vm = ci.DataContext as ColorInformationViewModel;
+            if (vm != null)
             {
-
+                vm.ComplementaryBrush = CalculateComplementaryColor(e.NewValue as SolidColorBrush);
+                var ab = CalculateColor(e.NewValue as SolidColorBrush, 30);
+                vm.AdjacentBrush1 = ab.Item1;
+                vm.AdjacentBrush2 = ab.Item2;
+                var cb = CalculateColor(e.NewValue as SolidColorBrush, 60);
+                vm.ContrastingBrush1 = cb.Item1;
+                vm.ContrastingBrush2 = cb.Item2;
+                var mb = CalculateColor(e.NewValue as SolidColorBrush, 90);
+                vm.MediumBrush1 = mb.Item1;
+                vm.MediumBrush2 = mb.Item2;
+                vm.MediumBrush3 = vm.ComplementaryBrush;
             }
-            else
-            {
-                var ci = d as ColorInformation;
-                var vm = ci.DataContext as ColorInformationViewModel;
-                if (vm != null)
-                {
-                    vm.ComplementaryBrush = CalculateComplementaryColor(e.NewValue as SolidColorBrush);
-                    var ab = CalculateColor(e.NewValue as SolidColorBrush, 30);
-                    vm.AdjacentBrush1 = ab.Item1;
-                    vm.AdjacentBrush2 = ab.Item2;
-                    var cb = CalculateColor(e.NewValue as SolidColorBrush, 60);
-                    vm.ContrastingBrush1 = cb.Item1;
-                    vm.ContrastingBrush2 = cb.Item2;
-                    var mb = CalculateColor(e.NewValue as SolidColorBrush, 90);
-                    vm.MediumBrush1 = mb.Item1;
-                    vm.MediumBrush2 = mb.Item2;
-                    vm.MediumBrush3 = vm.ComplementaryBrush;
-                }
-            }
-            
         }
 
         private void RenderColorPicker(double brightness)
@@ -220,25 +226,8 @@ namespace Palette.Views
             HSBColor hsb = new HSBColor(BrightnessRecordColor);
             hsb.S = e.NewValue / 100;
             hsb.B = 1 - this.ellipesMask.Opacity;
+            _callbackOperation = true;
             this.CurrentBrush = hsb.SolidColorBrush;
-
-            //重新设置指姆位置
-            Point point = new Point(this.cirThumb.Left + this.cirThumb.CirThumbRadius, this.cirThumb.Top + this.cirThumb.CirThumbRadius);
-            double r = radius * hsb.S;
-            var points = Utility.GetInsertPointBetweenCircleAndLine(point.X, point.Y, 140, 140, 140, 140, r);
-            if (points.Count > 1)
-            {
-                Vector v0 = Point.Subtract(points[0], point);
-                Vector v1 = Point.Subtract(points[1], point);
-                if (v0.Length > v1.Length)
-                {
-                    this.cirThumb.SetPosition(points[1].X, points[1].Y);
-                }
-                else
-                {
-                    this.cirThumb.SetPosition(points[0].X, points[0].Y);
-                }
-            }
         }
 
         private void CirThumb_ValueChanging(Point obj)
@@ -287,6 +276,128 @@ namespace Palette.Views
             this.saturationSlideblock.EndGradientColor = hsv.SolidColorBrush.Color;
         }
 
+        private void hexText_LostFocus(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var tb = sender as TextBox;
+                var hex = tb.Text;
+                if (string.IsNullOrWhiteSpace(hex)) return;
+                var color = (Color)ColorConverter.ConvertFromString(hex);
+                RGBColor rgb = new RGBColor(color);
+                if (rgb.SolidColorBrush != null)
+                {
+                    _callbackOperation = true;
+                    this.CurrentBrush = rgb.SolidColorBrush;
+                }
+                else
+                {
+                    MessageExtension.Show("令牌无效");
+                    tb.Text = string.Empty;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageExtension.Show(ex.Message);
+                return;
+            }
+        }
+        private void rgbText_LostFocus(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Regex regex = new Regex(@"^\d{1,3},\d{1,3},\d{1,3}$");
+                var tb = sender as TextBox;
+                var rgbstr = tb.Text;
+                if (!regex.IsMatch(rgbstr))
+                {
+                    MessageExtension.Show("令牌无效");
+                }
+                string[] rgbs = rgbstr.Split(",");
+                foreach (var item in rgbs)
+                {
+                    int i = int.Parse(item);
+                    if (i > 255 && i < 0)
+                    {
+                        MessageExtension.Show("令牌无效");
+                        return;
+                    }
+                }
+                RGBColor rgb = new RGBColor(255, int.Parse(rgbs[0]), int.Parse(rgbs[1]), int.Parse(rgbs[2]));
+                if (rgb.SolidColorBrush != null)
+                {
+                    _callbackOperation = true;
+                    this.CurrentBrush = rgb.SolidColorBrush;
+                }
+                else
+                {
+                    MessageExtension.Show("令牌无效");
+                    tb.Text = string.Empty;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageExtension.Show(ex.Message);
+                return;
+            }
+        }
 
+        private void hsbText_LostFocus(object sender, RoutedEventArgs e)
+        {
+            Regex regex = new Regex(@"^\d{1,3},\d{1,3}%,\d{1,3}%$");
+            try
+            {
+                var tb = sender as TextBox;
+                var hsbstr = tb.Text;
+
+                if (!regex.IsMatch(hsbstr))
+                {
+                    MessageExtension.Show("令牌无效");
+                    return;
+                }
+                string[] hsbs = hsbstr.Split(",");
+                int h = int.Parse(hsbs[0]);
+                if (h < 0 || h >= 360)
+                {
+                    MessageExtension.Show("令牌无效");
+                    return;
+                }
+                int index1 = hsbstr.IndexOf(",");
+                int index2 = hsbstr.IndexOf("%");
+                int length1 = index2 - index1 - 1;
+                // var a = hsbstr.Substring(index1+1, length1);
+                int s = int.Parse(hsbstr.Substring(index1 + 1, length1));
+                if (s > 100)
+                {
+                    MessageExtension.Show("令牌无效");
+                    return;
+                }
+                int length2 = hsbstr.Length - index2 - 3;
+                int b = int.Parse(hsbstr.Substring(index2 + 2, length2));
+                if (b > 100)
+                {
+                    MessageExtension.Show("令牌无效");
+                    return;
+                }
+
+                HSBColor hsb = new HSBColor(h, (double)s / 100, (double)b / 100);
+                if (hsb.SolidColorBrush != null)
+                {
+                    _callbackOperation = true;
+                    this.CurrentBrush = hsb.SolidColorBrush;
+                }
+                else
+                {
+                    MessageExtension.Show("令牌无效");
+                    tb.Text = string.Empty;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageExtension.Show(ex.Message);
+                return;
+            }
+
+        }
     }
 }

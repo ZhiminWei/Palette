@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using System.Windows;
+using System.Windows.Media;
 
 namespace Palette.Extension
 {
@@ -61,11 +62,11 @@ namespace Palette.Extension
 
         public static HSBColor RGBToHSB(RGBColor rgbColor)
         {
-            if (rgbColor.R== rgbColor.G && rgbColor.G == rgbColor.B)
+            if (rgbColor.R == rgbColor.G && rgbColor.G == rgbColor.B)
             {
-                return new HSBColor(0, 0, (double)rgbColor.B/255);
+                return new HSBColor(0, 0, (double)rgbColor.B / 255);
             }
-            
+
             int[] rgb = new int[] { rgbColor.R, rgbColor.G, rgbColor.B };
             Array.Sort(rgb);
             int max = rgb[2];
@@ -204,5 +205,17 @@ namespace Palette.Extension
             return equationRoot;
         }
 
+        public static Point GetPointLocationBySolidColorBrush(SolidColorBrush solidColorBrush, Point center, int radius)
+        {
+            HSBColor hsb = new HSBColor(solidColorBrush.Color);
+            double length = radius * hsb.S;
+            double angle = hsb.H;
+            double xoffset;
+            double yoffset;
+            xoffset = length * Math.Sin(angle * Math.PI / 180);
+            yoffset = -length * Math.Cos(angle * Math.PI / 180);
+            Point point = new Point(center.X + xoffset, center.Y + yoffset);
+            return point;
+        }
     }
 }
