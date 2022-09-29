@@ -28,7 +28,6 @@ namespace Palette.Views
     /// </summary>
     public partial class ColorInformation : UserControl
     {
-
         public ColorInformation()
         {
             InitializeComponent();
@@ -48,43 +47,8 @@ namespace Palette.Views
                     }
                 });
         }
-        private static SolidColorBrush CalculateComplementaryColor(SolidColorBrush brush)
-        {
-            HSBColor hsb = new HSBColor(brush.Color);
-            var h = hsb.H + 180;
-            if (h > 360)
-                h -= 360;
-            hsb.H = h;
 
-            return hsb.SolidColorBrush;
-        }
-
-        private static (SolidColorBrush, SolidColorBrush) CalculateColor(SolidColorBrush brush, int degree)
-        {
-            HSBColor hsb1 = new HSBColor(brush.Color);
-            var h1 = hsb1.H + degree;
-            if (h1 > 360)
-            {
-                h1 -= 360;
-            }
-            hsb1.H = h1;
-
-            HSBColor hsb2 = new HSBColor(brush.Color);
-            var h2 = hsb2.H - degree;
-            if (h2 < 0)
-            {
-                h2 += 360;
-            }
-            hsb2.H = h2;
-            return new(hsb1.SolidColorBrush, hsb2.SolidColorBrush);
-        }
-
-        #region Colors
-
-        #endregion
-
-
-
+        private bool _canExecute = false;
         static bool _callbackOperation = false;
         private int radius = 130;
         private WriteableBitmap bitmap;
@@ -93,13 +57,11 @@ namespace Palette.Views
         /// </summary>
         private static Color CurHighestBrightnessColor;
         private static Color BrightnessRecordColor;
-
         public SolidColorBrush CurrentBrush
         {
             get { return (SolidColorBrush)GetValue(CurrentBrushProperty); }
             set { SetValue(CurrentBrushProperty, value); }
         }
-
         // Using a DependencyProperty as the backing store for CurrentBrush.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty CurrentBrushProperty =
             DependencyProperty.Register("CurrentBrush", typeof(SolidColorBrush), typeof(ColorInformation),
@@ -113,14 +75,21 @@ namespace Palette.Views
             }
             return DependencyProperty.UnsetValue;
         }
-
         private static void OnCurrentBrushChangedCallBack(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (_callbackOperation)
             {
-                var ColorInformation = d as ColorInformation;
-                var point = Utility.GetPointLocationBySolidColorBrush(e.NewValue as SolidColorBrush, new Point(140, 140), 130);
-                ColorInformation?.cirThumb.SetPosition(point);
+                var colorInformation = d as ColorInformation;
+                SolidColorBrush solidColorBrush = e.NewValue as SolidColorBrush;
+                var point = Utility.GetPointLocationBySolidColorBrush(solidColorBrush, new Point(140, 140), 130);
+                colorInformation?.cirThumb.SetPosition(point);
+                HSBColor hsb = new HSBColor(solidColorBrush.Color);
+                colorInformation.saturationSlideblock.Value = hsb.S * 100;
+                colorInformation.transparentSlideblock.EndGradientColor = solidColorBrush.Color;
+                colorInformation.transparentSlideblock.Value = hsb.B * 100;
+                colorInformation.ellipesMask.Opacity = 1 - hsb.B;
+                hsb.S = 1;
+                colorInformation.saturationSlideblock.EndGradientColor = hsb.SolidColorBrush.Color;
                 _callbackOperation = false;
             }
             var ci = d as ColorInformation;
@@ -140,7 +109,6 @@ namespace Palette.Views
                 vm.MediumBrush3 = vm.ComplementaryBrush;
             }
         }
-
         private void RenderColorPicker(double brightness)
         {
             bitmap = new WriteableBitmap(radius * 2 + 20, radius * 2 + 20, 96.0, 96.0, PixelFormats.Pbgra32, null);
@@ -189,7 +157,6 @@ namespace Palette.Views
             });
             this.img.Source = bitmap;
         }
-
         /// <summary>
         /// 亮度值改变
         /// </summary>
@@ -197,6 +164,7 @@ namespace Palette.Views
         /// <param name="e"></param>
         private void transparentSlideblock_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            if (_callbackOperation) return;
             this.ellipesMask.Opacity = 1 - e.NewValue / 100;                  //设置调色盘亮度
             RenderBrush(e.NewValue / 100);                                    //渲染当前颜色
             this.saturationSlideblock.MaskOpacity = 1 - e.NewValue / 100;       //设置饱和度滑块背景亮度
@@ -210,14 +178,9 @@ namespace Palette.Views
                 (int)(CurHighestBrightnessColor.B * brightness));
             this.CurrentBrush = rgb.SolidColorBrush;
         }
-
-        private bool _canExecute = false;
         private void saturationSlideblock_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (!_canExecute)
-            {
-                return;
-            }
+            if (!_canExecute || _callbackOperation) return;
             //修改亮度滑块渐变色饱和度
             HSBColor hsv = new HSBColor(BrightnessRecordColor);
             hsv.S = e.NewValue / 100;
@@ -229,7 +192,6 @@ namespace Palette.Views
             _callbackOperation = true;
             this.CurrentBrush = hsb.SolidColorBrush;
         }
-
         private void CirThumb_ValueChanging(Point obj)
         {
             HSBColor hsv;
@@ -275,7 +237,6 @@ namespace Palette.Views
             hsv.S = 1;                                  //               设置滑块对应最大饱和度颜色
             this.saturationSlideblock.EndGradientColor = hsv.SolidColorBrush.Color;
         }
-
         private void hexText_LostFocus(object sender, RoutedEventArgs e)
         {
             try
@@ -341,7 +302,6 @@ namespace Palette.Views
                 return;
             }
         }
-
         private void hsbText_LostFocus(object sender, RoutedEventArgs e)
         {
             Regex regex = new Regex(@"^\d{1,3},\d{1,3}%,\d{1,3}%$");
@@ -398,6 +358,35 @@ namespace Palette.Views
                 return;
             }
 
+        }
+        private static SolidColorBrush CalculateComplementaryColor(SolidColorBrush brush)
+        {
+            HSBColor hsb = new HSBColor(brush.Color);
+            var h = hsb.H + 180;
+            if (h > 360)
+                h -= 360;
+            hsb.H = h;
+
+            return hsb.SolidColorBrush;
+        }
+        private static (SolidColorBrush, SolidColorBrush) CalculateColor(SolidColorBrush brush, int degree)
+        {
+            HSBColor hsb1 = new HSBColor(brush.Color);
+            var h1 = hsb1.H + degree;
+            if (h1 > 360)
+            {
+                h1 -= 360;
+            }
+            hsb1.H = h1;
+
+            HSBColor hsb2 = new HSBColor(brush.Color);
+            var h2 = hsb2.H - degree;
+            if (h2 < 0)
+            {
+                h2 += 360;
+            }
+            hsb2.H = h2;
+            return new(hsb1.SolidColorBrush, hsb2.SolidColorBrush);
         }
     }
 }

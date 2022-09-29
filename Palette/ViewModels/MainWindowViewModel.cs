@@ -20,11 +20,11 @@ namespace Palette.ViewModels
             MenuItem = new List<NavigateItem>()
             {
                 new NavigateItem(){Icon = "\ue630", Title = "颜色信息"},
-                new NavigateItem(){Icon = "\ue886", Title = "UI色卡"},
                 new NavigateItem(){Icon = "\ue71f", Title = "传统色"},
-                new NavigateItem(){Icon = "\ue656", Title = "渐变色"},
-                new NavigateItem(){Icon = "\ue626", Title = "颜色提取"},
-                new NavigateItem(){Icon = "\ue634", Title = "我的颜色"},
+                //new NavigateItem(){Icon = "\ue886", Title = "UI色卡"},
+                //new NavigateItem(){Icon = "\ue656", Title = "渐变色"},
+                //new NavigateItem(){Icon = "\ue626", Title = "颜色提取"},
+                //new NavigateItem(){Icon = "\ue634", Title = "我的颜色"},
             };
             this.FrameworkElement = new ColorInformation();
             UIContainer.Add("颜色信息", this.FrameworkElement);
@@ -100,7 +100,7 @@ namespace Palette.ViewModels
         {
             if (string.IsNullOrEmpty(key)) return;
 
-            if (UIContainer.TryGetValue(key,out FrameworkElement element))
+            if (UIContainer.TryGetValue(key, out FrameworkElement element))
             {
                 this.FrameworkElement = element;
             }
@@ -109,6 +109,11 @@ namespace Palette.ViewModels
                 if (key == "颜色信息")
                 {
                     this.FrameworkElement = new ColorInformation();
+                    UIContainer.Add(key, this.FrameworkElement);
+                }
+                else if (key == "传统色")
+                {
+                    this.FrameworkElement = new ChineseTraditionalColors();
                     UIContainer.Add(key, this.FrameworkElement);
                 }
             }

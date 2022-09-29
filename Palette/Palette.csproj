@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resource\bj.png" />
     <None Remove="Resource\iconfont.ttf" />
   </ItemGroup>
 
@@ -17,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resource\bj.png" />
     <Resource Include="Resource\iconfont.ttf" />
   </ItemGroup>
 

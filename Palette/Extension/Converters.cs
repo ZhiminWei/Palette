@@ -50,7 +50,6 @@ namespace Palette.Extension
         }
     }
 
-
     public class HEXStringRestructuringConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -68,6 +67,31 @@ namespace Palette.Extension
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return DependencyProperty.UnsetValue;
+        }
+    }
+
+    public class HexToSoilderBrushConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value != null)
+            {
+                if (parameter?.ToString() == "Brush")
+                {
+                    return new RGBColor(value.ToString()).SolidColorBrush;
+                }
+                else
+                {
+                    return new RGBColor(value.ToString()).SolidColorBrush.Color;
+                }
+
+            }
+            return DependencyProperty.UnsetValue;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }

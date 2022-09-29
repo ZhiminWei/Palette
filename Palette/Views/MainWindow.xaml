@@ -11,7 +11,6 @@
     Height="600"
     d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel,
                                      IsDesignTimeCreatable=True}"
-    ResizeMode="NoResize"
     mc:Ignorable="d">
     <Window.Resources>
         <Style TargetType="RadioButton">
